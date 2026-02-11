@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Note-Taking App</title>
+    <style>
+      :root {
+        --bg: #edf6f2;
+        --card: #ffffff;
+        --text: #102a22;
+        --muted: #527061;
+        --accent: #1a6d4d;
+        --soft: #e3f1eb;
+        --danger: #a12020;
+        --warning: #8f6100;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top right, #d7ece3 0%, var(--bg) 52%);
+      }
+
+      .container {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 16px 40px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 2rem;
+      }
+
+      .subtitle {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(18, 38, 32, 0.08);
+        padding: 18px;
+        margin-top: 14px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn-soft {
+        background: var(--soft);
+        color: var(--text);
+      }
+
+      .btn-danger {
+        background: #fdeeee;
+        color: var(--danger);
+      }
+
+      .select {
+        border: 1px solid #c5dace;
+        border-radius: 10px;
+        padding: 8px 10px;
+        min-height: 40px;
+        font-size: 0.95rem;
+      }
+
+      .status {
+        margin: 10px 0 0;
+        color: var(--accent);
+      }
+
+      .toast {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        max-width: 360px;
+        background: #fff7e8;
+        border: 1px solid #f2cd89;
+        color: #7a4c00;
+        border-radius: 10px;
+        padding: 10px 12px;
+        box-shadow: 0 8px 20px rgba(18, 38, 32, 0.12);
+        font-size: 0.92rem;
+        z-index: 1000;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 190px;
+        border: 1px solid #c6dbd0;
+        border-radius: 12px;
+        padding: 10px;
+        resize: vertical;
+        font-size: 1rem;
+      }
+
+      .notes {
+        display: grid;
+        gap: 10px;
+      }
+
+      .notes-header {
+        margin-bottom: 10px;
+      }
+
+      .note-item {
+        border: 1px solid #d2e2da;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fbfdfc;
+      }
+
+      .note-item p {
+        margin: 4px 0;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .empty {
+        border: 1px solid #d2e2da;
+        border-radius: 10px;
+        padding: 10px;
+        background: #f4f8f6;
+        color: var(--muted);
+      }
+
+      @media (min-width: 860px) {
+        .grid-2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>AI Note-Taking App</h1>
+      <p class="subtitle">Record notes, transcribe speech, summarize with local AI, then save/export.</p>
+
+      <div class="card">
+        <div class="row">
+          <button id="startBtn" class="btn-primary">Start Recording</button>
+          <button id="stopBtn" class="btn-soft" disabled>Stop Recording</button>
+          <button id="sampleBtn" class="btn-soft">Use Sample Audio</button>
+          <button id="processBtn" class="btn-primary" disabled>Transcribe + Summarize</button>
+          <button id="saveBtn" class="btn-soft">Save Note</button>
+          <button id="clearBtn" class="btn-danger">Clear</button>
+        </div>
+        <p id="status" class="status">Idle.</p>
+        <audio id="audioPreview" controls style="width: 100%; margin-top: 8px" hidden></audio>
+      </div>
+
+      <div class="card grid-2">
+        <div>
+          <label for="transcript">Transcript</label>
+          <textarea id="transcript" placeholder="Transcription output..."></textarea>
+        </div>
+        <div>
+          <label for="summary">Summary</label>
+          <textarea id="summary" placeholder="Summary output..."></textarea>
+        </div>
+        <div class="row notes-header" style="grid-column: 1 / -1; margin-top: 4px">
+          <button id="copyCurrentBtn" class="btn-soft">Copy Current Note</button>
+          <button id="downloadCurrentBtn" class="btn-soft">Download Current Note</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row notes-header">
+          <label style="margin: 0">Recent Notes</label>
+        </div>
+        <div id="recentNotes" class="notes">
+          <div class="empty">No saved notes yet.</div>
+        </div>
+      </div>
+    </div>
+    <div id="warningToast" class="toast hidden"></div>
+
+    <script>
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const sampleBtn = document.getElementById("sampleBtn");
+      const processBtn = document.getElementById("processBtn");
+      const saveBtn = document.getElementById("saveBtn");
+      const copyCurrentBtn = document.getElementById("copyCurrentBtn");
+      const downloadCurrentBtn = document.getElementById("downloadCurrentBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const whisperModelEl = { value: "tiny.en" };
+
+      const statusEl = document.getElementById("status");
+      const transcriptEl = document.getElementById("transcript");
+      const summaryEl = document.getElementById("summary");
+      const audioPreviewEl = document.getElementById("audioPreview");
+      const recentNotesEl = document.getElementById("recentNotes");
+      const warningToastEl = document.getElementById("warningToast");
+
+      const NOTES_KEY = "ai_notes_workshop_notes_v3";
+
+      let mediaRecorder;
+      let chunks = [];
+      let audioBlob = null;
+      let recordedMimeType = "audio/webm";
+      let audioPreviewUrl = "";
+      let warningToastTimer = null;
+
+      const setStatus = (msg) => (statusEl.textContent = msg);
+      const showWarningToast = (msg) => {
+        if (!msg) return;
+        warningToastEl.textContent = msg;
+        warningToastEl.classList.remove("hidden");
+        if (warningToastTimer) clearTimeout(warningToastTimer);
+        warningToastTimer = setTimeout(() => {
+          warningToastEl.classList.add("hidden");
+        }, 3200);
+      };
+
+      const pickMimeType = () => {
+        const candidates = [
+          "audio/webm;codecs=opus",
+          "audio/webm",
+          "audio/mp4",
+          "audio/ogg;codecs=opus",
+        ];
+        for (const type of candidates) {
+          if (window.MediaRecorder && MediaRecorder.isTypeSupported(type)) return type;
+        }
+        return "";
+      };
+
+      const fileNameForMime = (mimeType) => {
+        if (mimeType.includes("wav")) return "recording.wav";
+        if (mimeType.includes("mp4")) return "recording.mp4";
+        if (mimeType.includes("ogg")) return "recording.ogg";
+        return "recording.webm";
+      };
+
+      const setAudioPreview = (blob) => {
+        if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+        audioPreviewUrl = URL.createObjectURL(blob);
+        audioPreviewEl.src = audioPreviewUrl;
+        audioPreviewEl.hidden = false;
+      };
+
+      const noteText = (note) =>
+        `Created: ${note.createdAt}\nModel: ${note.whisperModel}\n\nTranscript:\n${note.transcript}\n\nSummary:\n${note.summary}\n`;
+
+      const downloadTextFile = (filename, content) => {
+        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      const copyText = async (text) => {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
+      const loadNotes = () => {
+        try {
+          return JSON.parse(localStorage.getItem(NOTES_KEY) || "[]");
+        } catch {
+          return [];
+        }
+      };
+
+      const saveNotes = (notes) => localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+
+      const renderNotes = () => {
+        const notes = loadNotes();
+        recentNotesEl.textContent = "";
+        if (!notes.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "No saved notes yet.";
+          recentNotesEl.appendChild(empty);
+          return;
+        }
+
+        notes.slice(0, 8).forEach((note, index) => {
+          const item = document.createElement("div");
+          item.className = "note-item";
+
+          const meta = document.createElement("p");
+          meta.className = "meta";
+          meta.textContent = `${note.createdAt} | model=${note.whisperModel}`;
+
+          const transcript = document.createElement("p");
+          transcript.textContent = `Transcript: ${note.transcript.slice(0, 180)}`;
+
+          const summary = document.createElement("p");
+          summary.textContent = `Summary: ${note.summary.slice(0, 180)}`;
+
+          const actions = document.createElement("div");
+          actions.className = "row";
+
+          const loadBtn = document.createElement("button");
+          loadBtn.className = "btn-soft";
+          loadBtn.textContent = "Load";
+          loadBtn.addEventListener("click", () => {
+            transcriptEl.value = note.transcript || "";
+            summaryEl.value = note.summary || "";
+            whisperModelEl.value = note.whisperModel || "tiny.en";
+            setStatus(`Loaded note ${index + 1}.`);
+          });
+
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "btn-soft";
+          copyBtn.textContent = "Copy";
+          copyBtn.addEventListener("click", async () => {
+            const ok = await copyText(noteText(note));
+            setStatus(ok ? "Copied note to clipboard." : "Clipboard copy failed.");
+          });
+
+          const downloadBtn = document.createElement("button");
+          downloadBtn.className = "btn-soft";
+          downloadBtn.textContent = "Download";
+          downloadBtn.addEventListener("click", () => {
+            downloadTextFile(`note-${index + 1}.txt`, noteText(note));
+            setStatus("Downloaded note file.");
+          });
+
+          const delBtn = document.createElement("button");
+          delBtn.className = "btn-danger";
+          delBtn.textContent = "Delete";
+          delBtn.addEventListener("click", () => {
+            const current = loadNotes();
+            current.splice(index, 1);
+            saveNotes(current);
+            renderNotes();
+            setStatus("Deleted saved note.");
+          });
+
+          actions.appendChild(loadBtn);
+          actions.appendChild(copyBtn);
+          actions.appendChild(downloadBtn);
+          actions.appendChild(delBtn);
+
+          item.appendChild(meta);
+          item.appendChild(transcript);
+          item.appendChild(summary);
+          item.appendChild(actions);
+          recentNotesEl.appendChild(item);
+        });
+      };
+
+      startBtn.addEventListener("click", async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mimeType = pickMimeType();
+          mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+          chunks = [];
+          audioBlob = null;
+          recordedMimeType = mediaRecorder.mimeType || mimeType || "audio/webm";
+          mediaRecorder.ondataavailable = (event) => chunks.push(event.data);
+          mediaRecorder.onstop = () => {
+            audioBlob = new Blob(chunks, { type: recordedMimeType });
+            setAudioPreview(audioBlob);
+            processBtn.disabled = false;
+            setStatus("Recording captured. Ready to process.");
+          };
+          mediaRecorder.start();
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+          processBtn.disabled = true;
+          setStatus("Recording...");
+        } catch (err) {
+          setStatus(`Microphone error: ${err.message}`);
+        }
+      });
+
+      stopBtn.addEventListener("click", () => {
+        if (!mediaRecorder) return;
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      });
+
+      sampleBtn.addEventListener("click", async () => {
+        try {
+          const res = await fetch("/static/sample-note.wav");
+          if (!res.ok) throw new Error("sample audio missing");
+          audioBlob = await res.blob();
+          recordedMimeType = "audio/wav";
+          setAudioPreview(audioBlob);
+          processBtn.disabled = false;
+          setStatus("Sample audio loaded. Ready to process.");
+        } catch (err) {
+          setStatus(`Sample audio error: ${err.message}`);
+        }
+      });
+
+      processBtn.addEventListener("click", async () => {
+        if (!audioBlob) return;
+        try {
+          setStatus("Processing...");
+          processBtn.disabled = true;
+          const formData = new FormData();
+          formData.append("audio", audioBlob, fileNameForMime(recordedMimeType));
+          formData.append("whisper_model", whisperModelEl.value);
+          const res = await fetch("/api/process", { method: "POST", body: formData });
+          if (!res.ok) throw new Error(await res.text());
+          const data = await res.json();
+          transcriptEl.value = data.transcript || "";
+          summaryEl.value = data.summary || "";
+          if (data.warning) showWarningToast(data.warning);
+          setStatus(data.warning ? `Warning: ${data.warning}` : "Done.");
+        } catch (err) {
+          setStatus(`Processing error: ${err.message}`);
+        } finally {
+          processBtn.disabled = false;
+        }
+      });
+
+      saveBtn.addEventListener("click", () => {
+        const transcript = transcriptEl.value.trim();
+        const summary = summaryEl.value.trim();
+        if (!transcript && !summary) {
+          setStatus("Nothing to save yet.");
+          return;
+        }
+        const notes = loadNotes();
+        notes.unshift({
+          createdAt: new Date().toLocaleString(),
+          whisperModel: whisperModelEl.value,
+          transcript,
+          summary,
+        });
+        saveNotes(notes);
+        renderNotes();
+        setStatus("Saved note locally.");
+      });
+
+      copyCurrentBtn.addEventListener("click", async () => {
+        const transcript = transcriptEl.value.trim();
+        const summary = summaryEl.value.trim();
+        if (!transcript && !summary) {
+          setStatus("Nothing to copy yet.");
+          return;
+        }
+        const text = noteText({
+          createdAt: new Date().toLocaleString(),
+          whisperModel: whisperModelEl.value,
+          transcript,
+          summary,
+        });
+        const ok = await copyText(text);
+        setStatus(ok ? "Copied current note to clipboard." : "Clipboard copy failed.");
+      });
+
+      downloadCurrentBtn.addEventListener("click", () => {
+        const transcript = transcriptEl.value.trim();
+        const summary = summaryEl.value.trim();
+        if (!transcript && !summary) {
+          setStatus("Nothing to download yet.");
+          return;
+        }
+        const text = noteText({
+          createdAt: new Date().toLocaleString(),
+          whisperModel: whisperModelEl.value,
+          transcript,
+          summary,
+        });
+        downloadTextFile("current-note.txt", text);
+        setStatus("Downloaded current note.");
+      });
+
+      clearBtn.addEventListener("click", () => {
+        transcriptEl.value = "";
+        summaryEl.value = "";
+        audioBlob = null;
+        processBtn.disabled = true;
+        audioPreviewEl.hidden = true;
+        audioPreviewEl.src = "";
+        if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+        audioPreviewUrl = "";
+        setStatus("Cleared.");
+      });
+
+      renderNotes();
+    </script>
+  </body>
+</html>

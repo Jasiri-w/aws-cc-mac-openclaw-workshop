@@ -240,11 +240,8 @@ These instructions will be for you on your own.
 Back in your **SSH terminal** on the EC2 instance, install OpenClaw using the quick-start command:
 
 ```bash
-Go to https://openclaw.ai/ and find the installation code for your device
+curl -fsSL https://install.openclaw.io | bash
 ```
-
-e.g.
-![alt text](image.png)
 
 This will launch the OpenClaw installation wizard. **Follow these prompts:**
 

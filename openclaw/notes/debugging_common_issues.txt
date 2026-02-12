@@ -1,0 +1,63 @@
+# Debugging Common Issues - Quick Reference
+
+## OpenClaw Installation & Setup
+
+### Issue: Installation Script Fails
+- **Check:** Node.js version >= 18 (preferably 20)
+  - Run `node --version`
+- **Check:** npm is up to date
+  - Run `npm install -g npm@latest`
+- **Check:** curl and git are installed
+  - Run `curl --version` and `git --version`
+- **Solution:** Restart terminal after installing dependencies
+
+### Issue: Discord Bot Not Responding
+- **Check:** Bot token is correct
+  - Regenerate token in Discord Developer Portal if unsure
+- **Check:** Discord bot is in the server
+  - Create OAuth2 URL with `bot` scope and authorize
+- **Check:** OpenClaw process is running
+  - Run `ps aux | grep openclaw`
+- **Check:** API keys are valid (OpenAI, Discord)
+  - Test API connectivity: `curl -H "Authorization: Bearer YOUR_KEY" https://api.openai.com/v1/models`
+
+### Issue: S3 Access Denied
+- **Check:** IAM role is attached to EC2 instance
+  - Go to EC2 console → Instance → Security → IAM role
+- **Check:** Role has S3FullAccess policy
+  - Verify in IAM console under the role
+- **Check:** Instance was rebooted after role attachment
+  - Reboot if not done after attaching role
+- **Solution:** Run `aws sts get-caller-identity` to verify credentials
+
+## Local Web App Issues
+
+### Issue: Microphone Not Working
+- **Check:** Browser permissions
+  - Click lock icon in URL bar → Site settings → Microphone
+- **Check:** No other app is using the microphone
+  - Close video calls, other apps
+- **Solution:** Restart browser and try again
+
+### Issue: Whisper Model Download Fails
+- **Check:** Internet connection
+- **Check:** Storage space (models are 1-3 GB)
+  - Run `df -h` to check disk space
+- **Check:** ffmpeg is installed
+  - Run `ffmpeg -version`
+- **Solution:** Manually download model: `ollama pull llama3.2:3b`
+
+### Issue: FastAPI Backend Not Starting
+- **Check:** Port 8000 is not in use
+  - Run `lsof -i :8000` (macOS/Linux) or `netstat -ano | findstr :8000` (Windows)
+- **Check:** Virtual environment is activated
+  - Should see `(.venv)` in terminal prompt
+- **Check:** All dependencies are installed
+  - Run `pip list | grep -E "fastapi|uvicorn|faster-whisper"`
+- **Solution:** Use different port: `uvicorn app.main:app --port 8001`
+
+## General Debugging Tips
+- Always check logs first: `journalctl -u openclaw` for system logs
+- Increase verbosity: Add `--verbose` or `-v` flags when available
+- Restart services after configuration changes
+- Clear cache: `.openclaw/cache/` if experiencing strange behavior

@@ -1,0 +1,74 @@
+# **Course Summary: Machine Learning Fundamentals (CS 3202)**
+
+## **Course Overview**
+CS 3202 introduces students to machine learning principles, algorithms, and applications. Students learn supervised and unsupervised learning techniques, feature engineering, model evaluation, and practical implementation using Python libraries like scikit-learn and TensorFlow.
+
+---
+
+## **Instructor Information**
+- **Instructor:** Dr. James Park  
+- **Office Hours:** Mondays & Wednesdays, 3:00–4:30 PM (CS Building, Room 405)  
+- **Email:** j.park@university.edu  
+
+---
+
+## **Course Schedule**
+- **Lectures:** Mondays & Wednesdays, 1:00–2:30 PM  
+- **Lab Sessions:** Thursdays, 2:00–4:00 PM  
+- **Location:** Tech Center 110  
+
+---
+
+## **Major Coursework & Deadlines**
+
+### **1. Weekly Coding Assignments**
+- **Description:** Python-based ML exercises covering regression, classification, and clustering.  
+- **Weight:** 25%  
+- **Deadlines:** Every Thursday at 11:59 PM  
+
+---
+
+### **2. Midterm Project**
+- **Description:** Build and evaluate a predictive model on a provided dataset.  
+- **Weight:** 20%  
+- **Submission Date:** **October 24**  
+- **Deliverables:**  
+  - Jupyter notebook with analysis  
+  - Model performance report  
+  - Brief presentation  
+
+---
+
+### **3. Final Capstone Project**
+- **Description:** Students select a real-world dataset and build a complete ML pipeline from data cleaning to deployment.  
+- **Weight:** 35%  
+- **Proposal Due:** **November 5**  
+- **Final Presentation:** **December 16**  
+- **Deliverables:**  
+  - Complete code repository  
+  - Documentation  
+  - Live demo or model deployment  
+
+---
+
+### **4. Final Exam**
+- **Description:** Written exam on ML theory, algorithms, and best practices.  
+- **Weight:** 20%  
+- **Date:** **December 18**  
+
+---
+
+## **Grading Breakdown**
+| Component | Weight |
+|----------|--------|
+| Weekly Assignments | 25% |
+| Midterm Project | 20% |
+| Capstone Project | 35% |
+| Final Exam | 20% |
+
+---
+
+## **Course Policies**
+- **Late Submission:** 15% deduction per day, maximum 5 days.  
+- **Academic Integrity:** Code plagiarism will result in zero credit and disciplinary action.  
+- **Collaboration:** Individual work unless explicitly stated as a group assignment.

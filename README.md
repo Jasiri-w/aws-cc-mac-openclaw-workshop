@@ -1,101 +1,64 @@
-# aws-cc-mac-openclaw-workshop
+# AWS Cloud Club: OpenClaw Workshop
 
-Workshop scaffold for an AI note-taking app:
-- record audio in browser
-- transcribe locally with Whisper
-- summarize locally with an LLM (Ollama)
-- model toggle for reliability demos
-- save recent notes locally for demo continuity
-- hand off clean JSON output to AWS/OpenClaw teammates
+A hands-on workshop for building an AI-powered note-taking system and cloud-hosted Discord bot.
 
-## Scope of this repo section (Angad / Step 1)
+## Project Overview
 
-This implementation focuses only on the local web app + local AI pipeline:
-- in-browser recording UI
-- local speech-to-text
-- local summarization
-- local note save/load for iteration
+This workshop walks through two main components:
 
-It intentionally does not implement AWS persistence/search or OpenClaw provisioning.
+1. **Local AI Note-Taker Web App** — Record audio in your browser, transcribe locally with Whisper, and summarize with a local LLM
+2. **OpenClaw on AWS EC2 + Discord** — Deploy a cloud-hosted AI agent connected to OpenAI's GPT API and Discord, with persistent S3 storage
 
-## What this repo includes now
+## Quick Start
 
-- `app/frontend/index.html`: workshop UI with:
-  - whisper model selector (`tiny.en` vs `base`)
-  - sample audio fallback button
-  - simple step flow (`Record -> Transcribe + Summarize -> Save`)
-  - transcript confidence note
-  - local saved notes list with copy/download actions
-- `app/main.py`: FastAPI backend (`/api/transcribe`, `/api/summarize`, `/api/process`, `/api/preflight`)
-- `app/frontend/sample-note.wav`: bundled sample speech clip
-- `.env.example`: local config template
-- `requirements.txt`: Python dependencies
-
-## Local architecture
-
-1. Browser records audio (`MediaRecorder`) or loads sample clip
-2. Audio is posted to local FastAPI backend
-3. Backend transcribes using `faster-whisper`
-4. Backend summarizes transcript with local Ollama model
-5. Output is shown and can be edited/saved locally
-
-## Prerequisites (macOS)
-
-- Python 3.10+ (3.12 recommended for stability)
-- `ffmpeg` installed:
-  - `brew install ffmpeg`
-- Ollama installed and running:
-  - `brew install ollama`
-  - `ollama serve`
-  - `ollama pull llama3.2:3b`
-
-## Quick start
-
+### Web App (Local Development)
 ```bash
+cd ai-note-taker-web-app
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --reload --reload-dir app --port 8000
+uvicorn app.main:app --reload --port 8000
 ```
 
-Open: `http://localhost:8000`
+Then open: `http://localhost:8000`
 
-## API endpoints
+### Workshop Guides
 
-- `POST /api/transcribe` (multipart form fields `audio`, optional `whisper_model`) -> transcript + confidence
-- `POST /api/summarize` (form field `text`) -> summary from transcript text
-- `POST /api/process` (multipart form fields `audio`, optional `whisper_model`) -> combined helper endpoint
+Detailed step-by-step guides are in the [`workshop/`](workshop/) folder:
 
-## Workshop flow for this section (Angad)
+- **[OpenClaw Guide](workshop/openclaw-guide.md)** — Deploy OpenClaw on AWS EC2, connect to OpenAI, integrate with Discord, and add S3 file access skills
+- **[Web App Guide](workshop/web-app-guide.md)** — Build and demo the local note-taking module with live model tradeoff showcase
 
-1. Students open app and record a short note (10-20s), or click `Use Sample Audio`.
-2. Click `Transcribe + Summarize`.
-3. Inspect transcript quality and confidence note; switch `tiny.en` vs `base`.
-4. Save locally and demo `Load`, `Copy`, and `Download` from recent notes.
+## Project Structure
 
-## Handoff contract to AWS/OpenClaw teammates
-
-After local processing, pass this payload shape to AWS endpoints:
-
-```json
-{
-  "transcript": "...",
-  "summary": "...",
-  "confidence_note": "...",
-  "whisper_model": "tiny.en"
-}
+```
+.
+├── ai-note-taker-web-app/    # Local web app with FastAPI backend
+├── openclaw/                  # OpenClaw agent files (to be configured during workshop)
+├── workshop/                  # Detailed workshop guides and screenshots
+└── README.md                  # This file
 ```
 
-AWS/OpenClaw team can add IDs/timestamps/user metadata server-side.
+## Prerequisites
 
-## Common issues
+- AWS account with EC2 permissions
+- OpenAI API key
+- Discord account
+- Python 3.10+
+- `ffmpeg` and `ollama` (for local web app)
+- SSH client (Windows 10+, macOS, or Linux built-in)
 
-- `Processing failed` with decoder errors:
-  - verify `ffmpeg -version`
-- Slow first request:
-  - Whisper model download/load happens on first use
-- Ollama errors:
-  - verify `ollama serve` is running and model exists (`ollama list`)
-- Microphone blocked:
-  - allow mic permissions in browser settings
+## Estimated Workshop Time
+
+- **Web App (Step 1):** 20–25 minutes
+- **OpenClaw + AWS (Step 2+):** 30–40 minutes
+- **Full workshop:** ~1 hour
+
+## Support & Troubleshooting
+
+Refer to the [OpenClaw Guide](workshop/openclaw-guide.md#troubleshooting-guide) and [Web App Guide](workshop/web-app-guide.md#common-issues) troubleshooting sections for common issues.
+
+---
+
+**Let's build! 🚀**

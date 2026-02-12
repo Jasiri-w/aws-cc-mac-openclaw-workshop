@@ -1,0 +1,41 @@
+# AWS Security & Best Practices Notes
+
+## Key Security Concepts
+
+### 1. IAM Roles & Permissions
+- Always use IAM roles instead of hardcoding credentials
+- Principle of least privilege: grant only necessary permissions
+- Regular audit of role attachments and policies
+- Never share access keys or root credentials
+
+### 2. EC2 Instance Security
+- Restrict SSH to specific IP addresses (not 0.0.0.0)
+- Use security groups as a first layer of defense
+- Enable VPC endpoints for private AWS service access
+- Regularly patch and update instances
+
+### 3. S3 Bucket Security
+- Block public access by default
+- Use bucket policies to restrict access to specific IAM roles
+- Enable versioning for data recovery
+- Monitor access with S3 access logs
+- Use server-side encryption (SSE-S3 or KMS)
+
+### 4. API Keys & Secrets
+- Rotate API keys regularly (every 90 days recommended)
+- Never commit secrets to version control
+- Use environment variables for sensitive data
+- Store secrets in AWS Secrets Manager or Parameter Store
+
+### 5. Network Security
+- Use VPN or bastion hosts for remote access
+- Enable VPC Flow Logs for network monitoring
+- Implement Web Application Firewall (WAF) for public-facing apps
+- Use NACLs and security groups layered approach
+
+## Workshop-Specific Recommendations
+- Create a separate AWS account for workshop environments
+- Set up billing alerts to prevent unexpected charges
+- Use temporary credentials with session tokens
+- Clean up resources immediately after workshop completion
+- Document all manual configurations for reproducibility

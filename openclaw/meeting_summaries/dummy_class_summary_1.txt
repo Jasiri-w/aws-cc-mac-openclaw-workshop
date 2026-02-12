@@ -1,0 +1,75 @@
+# **Course Summary: Introduction to Computational Systems (COMP 2101)**
+
+## **Course Overview**
+COMP 2101 introduces students to the foundational concepts of computational systems, including operating systems, cloud infrastructure, virtualization, and distributed computing. The course blends theory with hands‑on practice, giving students experience with Linux environments, cloud platforms, and containerized workflows.
+
+---
+
+## **Instructor Information**
+- **Instructor:** Dr. Maya R. Chen  
+- **Office Hours:** Tuesdays 2:00–4:00 PM (IT Building, Room 312)  
+- **Email:** maya.chen@university.edu  
+
+---
+
+## **Weekly Structure**
+- **Lectures:** Mondays & Wednesdays, 10:30–11:50 AM  
+- **Labs:** Fridays, 1:00–3:00 PM  
+- **Location:** Engineering Hall 204  
+
+---
+
+## **Major Coursework & Deadlines**
+
+### **1. Lab Assignments (Weekly)**
+- **Description:** Short hands‑on tasks involving Linux commands, scripting, and system configuration.  
+- **Weight:** 20%  
+- **Deadlines:** Every Friday at 11:59 PM  
+
+---
+
+### **2. Midterm Exam**
+- **Description:** Closed‑book written exam covering Weeks 1–6.  
+- **Weight:** 25%  
+- **Date:** **October 17**  
+- **Format:** Short‑answer + problem‑solving questions  
+
+---
+
+### **3. Cloud Deployment Project**
+- **Description:** Students deploy a small web service on a cloud platform (AWS, Azure, or GCP).  
+- **Weight:** 30%  
+- **Milestones:**  
+  - **Proposal Due:** **November 1**  
+  - **Progress Check:** **November 15**  
+  - **Final Submission:** **December 3 at 11:59 PM**  
+- **Deliverables:**  
+  - Architecture diagram  
+  - Deployment scripts  
+  - Documentation  
+  - Live demo  
+
+---
+
+### **4. Final Exam**
+- **Description:** Comprehensive exam covering all course topics.  
+- **Weight:** 25%  
+- **Date:** **December 18**  
+- **Format:** Mixed multiple‑choice and long‑form conceptual questions  
+
+---
+
+## **Grading Breakdown**
+| Component | Weight |
+|----------|--------|
+| Labs | 20% |
+| Midterm | 25% |
+| Project | 30% |
+| Final Exam | 25% |
+
+---
+
+## **Key Policies**
+- **Late Work:** 10% penalty per day, up to 3 days.  
+- **Collaboration:** Discussion allowed; code must be individually written.  
+- **Academic Integrity:** Violations result in a zero and academic review.  

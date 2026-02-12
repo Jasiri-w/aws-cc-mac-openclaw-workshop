@@ -310,27 +310,6 @@ Run this to reload your environment.
 
 Select Hatch in TUI and after it loads try sending it a few messages to confirm that your llm is being communicated with.
 
-## Part 7: Test Your Bot in Discord
-
-1. **Go to your Discord server**
-2. **Find your test channel** (or create a new one)
-3. **Type a message:**
-   ```
-   @AWS CC Mac ClawBot Tell me about yourself
-   ```
-
-4. **Wait a moment** — you'll see "mobot is typing..."
-5. **OpenClaw responds** with its introduction
-
-Try more messages:
-- `@AWS CC Mac ClawBot What's 2+2?`
-- `@AWS CC Mac ClawBot Tell me a joke`
-- `@AWS CC Mac ClawBot Explain quantum computing`
-
-✅ **Your bot is working!**
-
----
-
 ---
 
 # Part 2 - Customization | Let's Give OpenClaw Some Tools

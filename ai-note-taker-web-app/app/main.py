@@ -1,4 +1,5 @@
 import os
+import boto3
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,6 +13,8 @@ from fastapi.staticfiles import StaticFiles
 from faster_whisper import WhisperModel
 from openai import OpenAI
 
+AWS_REGION="us-east-2"
+S3_BUCKET_NAME="open-claw-memory-1"
 
 ROOT = Path(__file__).resolve().parent
 FRONTEND_DIR = ROOT / "frontend"
@@ -35,7 +38,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 _whisper_models: dict[str, WhisperModel] = {}
-
+s3_client = boto3.client("s3", region_name=AWS_REGION)
 
 def get_whisper_model(model_name: str) -> WhisperModel:
     if model_name not in _whisper_models:
@@ -70,6 +73,24 @@ def validate_whisper_model(model_name: str) -> str:
         return model_name
     return WHISPER_MODEL_NAME
 
+def upload_summary_to_s3(summary_text: str) -> Optional[str]:
+    if not S3_BUCKET_NAME:
+        return None
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    filename = f"meeting_summary/summary_{timestamp}.txt"
+
+    try:
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=filename,
+            Body=summary_text.encode("utf-8"),
+            ContentType="text/plain",
+        )
+        return filename
+    except Exception as e:
+        print(f"S3 upload failed: {e}")
+        return None
 
 def fallback_summary(text: str) -> str:
     words = text.split()
@@ -199,15 +220,18 @@ async def process(
                 "whisper_model": whisper_model,
             }
         summary = await summarize_text(transcript)
+        s3_filename = upload_summary_to_s3(summary)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Processing failed: {exc}") from exc
     finally:
         os.unlink(tmp_path)
     return {
-        "transcript": transcript,
-        "summary": summary,
-        "confidence_note": confidence_note_for_transcript(transcript),
-        "whisper_model": whisper_model,
+    "transcript": transcript,
+    "summary": summary,
+    "confidence_note": confidence_note_for_transcript(transcript),
+    "whisper_model": whisper_model,
+    "saved_to_s3": bool(s3_filename),
+    "s3_filename": s3_filename,
     }
 
 
